@@ -1,3 +1,4 @@
+// src/components/User/UserForm.jsx
 import React, { useMemo, useState } from "react";
 import {
     Box,
@@ -40,9 +41,16 @@ const roles = [
     { value: "limpieza", label: "Limpieza", icon: <CleaningServicesIcon fontSize="small" /> },
 ];
 
-// Botón con colores consistentes (gradiente + hover)
+// Botón con colores consistentes
 const useButtonStyles = (theme) => ({
-    base: { borderRadius: 2, textTransform: "none", fontWeight: 700, letterSpacing: ".2px", paddingInline: 2.2, paddingBlock: 1 },
+    base: {
+        borderRadius: 2,
+        textTransform: "none",
+        fontWeight: 700,
+        letterSpacing: ".2px",
+        paddingInline: 2.2,
+        paddingBlock: 1,
+    },
     solidSecondary: {
         color: theme.palette.secondary.contrastText,
         background: `linear-gradient(90deg, ${alpha(theme.palette.secondary.main, 0.95)}, ${alpha(
@@ -51,10 +59,10 @@ const useButtonStyles = (theme) => ({
         )})`,
         boxShadow: `0 8px 20px ${alpha(theme.palette.secondary.main, 0.35)}`,
         "&:hover": {
-            background: `linear-gradient(90deg, ${alpha(theme.palette.secondary.dark || theme.palette.secondary.main, 0.98)}, ${alpha(
-                theme.palette.secondary.main,
+            background: `linear-gradient(90deg, ${alpha(
+                theme.palette.secondary.dark || theme.palette.secondary.main,
                 0.98
-            )})`,
+            )}, ${alpha(theme.palette.secondary.main, 0.98)})`,
             boxShadow: `0 8px 26px ${alpha(theme.palette.secondary.dark || theme.palette.secondary.main, 0.45)}`,
         },
         "&.Mui-disabled": {
@@ -66,7 +74,12 @@ const useButtonStyles = (theme) => ({
 });
 
 const baseValidation = yup.object({
-    username: yup.string().transform((v) => (v ? v.trim() : v)).min(3, "Mínimo 3 caracteres").max(40, "Máximo 40 caracteres").required("Requerido"),
+    username: yup
+        .string()
+        .transform((v) => (v ? v.trim() : v))
+        .min(3, "Mínimo 3 caracteres")
+        .max(40, "Máximo 40 caracteres")
+        .required("Requerido"),
     role: yup.string().oneOf(roles.map((r) => r.value), "Rol inválido").required("Requerido"),
 });
 
@@ -92,7 +105,8 @@ const makeSchema = (validatePassword) =>
 
 // Generador simple de password fuerte
 const genPassword = () => {
-    const chars = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz0123456789!@#$%^&*()-_=+[]{}";
+    const chars =
+        "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz0123456789!@#$%^&*()-_=+[]{}";
     const len = 12 + Math.floor(Math.random() * 5); // 12-16
     let out = "";
     for (let i = 0; i < len; i++) out += chars[Math.floor(Math.random() * chars.length)];
@@ -119,18 +133,30 @@ const UserForm = ({ initialValues, handleFormSubmit }) => {
     const [showConfirm, setShowConfirm] = useState(false);
 
     const [localPwd, setLocalPwd] = useState("");
-    const [localConfirm, setLocalConfirm] = useState("");
 
-    const validationSchema = useMemo(() => makeSchema(!isEdit || changePassword), [isEdit, changePassword]);
+    const validationSchema = useMemo(
+        () => makeSchema(!isEdit || changePassword),
+        [isEdit, changePassword]
+    );
 
-    const init = { username: initialValues?.username || "", role: initialValues?.role || "", password: "", confirmPassword: "" };
+    const init = {
+        username: initialValues?.username || "",
+        role: initialValues?.role || "",
+        password: "",
+        confirmPassword: "",
+    };
 
     const pwdScore = scorePassword(localPwd);
     const pwdBarSx = {
         height: 6,
         borderRadius: 999,
         "& .MuiLinearProgress-bar": {
-            backgroundColor: pwdScore <= 1 ? theme.palette.error.main : pwdScore === 2 ? theme.palette.warning.main : theme.palette.success.main,
+            backgroundColor:
+                pwdScore <= 1
+                    ? theme.palette.error.main
+                    : pwdScore === 2
+                        ? theme.palette.warning.main
+                        : theme.palette.success.main,
         },
         backgroundColor: alpha(theme.palette.grey[500], 0.25),
     };
@@ -151,9 +177,23 @@ const UserForm = ({ initialValues, handleFormSubmit }) => {
                 }
             }}
         >
-            {({ values, errors, touched, handleBlur, handleChange, handleSubmit, isSubmitting, setFieldValue }) => (
+            {({
+                values,
+                errors,
+                touched,
+                handleBlur,
+                handleChange,
+                handleSubmit,
+                isSubmitting,
+                setFieldValue,
+            }) => (
                 <form onSubmit={handleSubmit} noValidate>
-                    <Box display="grid" gap={2.5} gridTemplateColumns="repeat(4, minmax(0, 1fr))" sx={{ "& > .field": { gridColumn: "span 4" } }}>
+                    <Box
+                        display="grid"
+                        gap={2.5}
+                        gridTemplateColumns="repeat(4, minmax(0, 1fr))"
+                        sx={{ "& > .field": { gridColumn: "span 4" } }}
+                    >
                         {/* Username */}
                         <TextField
                             className="field"
@@ -170,7 +210,7 @@ const UserForm = ({ initialValues, handleFormSubmit }) => {
                             error={Boolean(touched.username && errors.username)}
                             helperText={touched.username && errors.username}
                             InputProps={{
-                                disableUnderline: true, // 👈 quita subrayado del filled
+                                disableUnderline: true,
                                 startAdornment: (
                                     <InputAdornment position="start">
                                         <PersonOutlineIcon fontSize="small" />
@@ -180,7 +220,12 @@ const UserForm = ({ initialValues, handleFormSubmit }) => {
                         />
 
                         {/* Role */}
-                        <FormControl variant="filled" fullWidth className="field" error={Boolean(touched.role && errors.role)}>
+                        <FormControl
+                            variant="filled"
+                            fullWidth
+                            className="field"
+                            error={Boolean(touched.role && errors.role)}
+                        >
                             <InputLabel id="role-label">Rol</InputLabel>
                             <Select
                                 labelId="role-label"
@@ -189,7 +234,7 @@ const UserForm = ({ initialValues, handleFormSubmit }) => {
                                 value={values.role}
                                 onChange={handleChange}
                                 onBlur={handleBlur}
-                                MenuProps={{ PaperProps: { className: "cm-menu" } }} // 👈 popup oscuro
+                                MenuProps={{ PaperProps: { className: "cm-menu" } }}
                             >
                                 {roles.map((r) => (
                                     <MenuItem key={r.value} value={r.value}>
@@ -198,7 +243,9 @@ const UserForm = ({ initialValues, handleFormSubmit }) => {
                                     </MenuItem>
                                 ))}
                             </Select>
-                            <FormHelperText>{touched.role && errors.role ? errors.role : "Selecciona el rol del usuario"}</FormHelperText>
+                            <FormHelperText>
+                                {touched.role && errors.role ? errors.role : "Selecciona el rol del usuario"}
+                            </FormHelperText>
                         </FormControl>
 
                         {/* Switch cambiar contraseña (solo en editar) */}
@@ -214,7 +261,6 @@ const UserForm = ({ initialValues, handleFormSubmit }) => {
                                                     setFieldValue("password", "");
                                                     setFieldValue("confirmPassword", "");
                                                     setLocalPwd("");
-                                                    setLocalConfirm("");
                                                 }
                                             }}
                                         />
@@ -247,7 +293,11 @@ const UserForm = ({ initialValues, handleFormSubmit }) => {
                                     }}
                                     value={values.password}
                                     error={Boolean(touched.password && errors.password)}
-                                    helperText={touched.password && errors.password ? errors.password : "Usa mayúsculas, minúsculas, números y símbolos."}
+                                    helperText={
+                                        touched.password && errors.password
+                                            ? errors.password
+                                            : "Usa mayúsculas, minúsculas, números y símbolos."
+                                    }
                                     InputProps={{
                                         disableUnderline: true,
                                         startAdornment: (
@@ -280,7 +330,9 @@ const UserForm = ({ initialValues, handleFormSubmit }) => {
                                                         onClick={async () => {
                                                             try {
                                                                 await navigator.clipboard.writeText(values.password || "");
-                                                            } catch { }
+                                                            } catch {
+                                                                // noop
+                                                            }
                                                         }}
                                                         edge="end"
                                                         size="small"
@@ -310,10 +362,7 @@ const UserForm = ({ initialValues, handleFormSubmit }) => {
                                     name="confirmPassword"
                                     autoComplete="new-password"
                                     onBlur={handleBlur}
-                                    onChange={(e) => {
-                                        handleChange(e);
-                                        setLocalConfirm(e.target.value);
-                                    }}
+                                    onChange={handleChange}
                                     value={values.confirmPassword}
                                     error={Boolean(touched.confirmPassword && errors.confirmPassword)}
                                     helperText={touched.confirmPassword && errors.confirmPassword}
@@ -326,7 +375,12 @@ const UserForm = ({ initialValues, handleFormSubmit }) => {
                                         ),
                                         endAdornment: (
                                             <InputAdornment position="end">
-                                                <IconButton aria-label="mostrar u ocultar confirmación" onClick={() => setShowConfirm((s) => !s)} edge="end" size="small">
+                                                <IconButton
+                                                    aria-label="mostrar u ocultar confirmación"
+                                                    onClick={() => setShowConfirm((s) => !s)}
+                                                    edge="end"
+                                                    size="small"
+                                                >
                                                     {showConfirm ? <VisibilityOff /> : <Visibility />}
                                                 </IconButton>
                                             </InputAdornment>

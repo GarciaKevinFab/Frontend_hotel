@@ -1,4 +1,4 @@
-// frontend/src/scenes/reports/index.jsx
+// src/scenes/Reports/index.jsx
 import React, { useEffect, useMemo, useState, useCallback, useRef } from "react";
 import axios from "axios";
 import {
@@ -181,12 +181,12 @@ function useReservations(from, to) {
                         .map((u) =>
                             u.razonSocial
                                 ? `${u.razonSocial} (RUC ${u.docNumber})`
-                                : `${[u.nombres, u.apellidoPaterno, u.apellidoMaterno].filter(Boolean).join(" ")}`
+                                : `${[u.nombres, u.apellidoPaterno, u.apellidoMaterno]
+                                    .filter(Boolean)
+                                    .join(" ")}`
                         )
                         .join(", "),
-                    docs: (r.userData || [])
-                        .map((u) => u.docNumber || u.dni || u.cedula || "")
-                        .join(", "),
+                    docs: (r.userData || []).map((u) => u.docNumber || u.dni || u.cedula || "").join(", "),
                     nationality: (r.userData || []).map((u) => u.nationality || "").join(", "),
                     price,
                     nights,
@@ -208,6 +208,7 @@ function useReservations(from, to) {
     useEffect(() => {
         fetchReservations();
     }, [fetchReservations]);
+
     return { rows, loading, error, refetch: fetchReservations };
 }
 
@@ -259,9 +260,7 @@ function FilesTab({ colors }) {
                         sx={[btn.base, btn.solid(theme, "primary")]}
                         onClick={() =>
                             window.open(
-                                `${BASE_URL.replace("/api", "")}/reports/${encodeURIComponent(
-                                    params.row.fileName
-                                )}`,
+                                `${BASE_URL.replace("/api", "")}/reports/${encodeURIComponent(params.row.fileName)}`,
                                 "_blank"
                             )
                         }
@@ -292,9 +291,7 @@ function FilesTab({ colors }) {
                     sx={[btn.base, btn.solid(theme, "secondary")]}
                     onClick={async () => {
                         try {
-                            await axios.get(`${BASE_URL}/reports/generate`, {
-                                withCredentials: true,
-                            });
+                            await axios.get(`${BASE_URL}/reports/generate`, { withCredentials: true });
                             await load();
                         } catch (e) {
                             console.error("Error al generar:", e);
@@ -317,10 +314,7 @@ function FilesTab({ colors }) {
                     "& .MuiDataGrid-root": { border: "none" },
                     "& .MuiDataGrid-cell": { borderBottom: "none" },
                     "& .MuiDataGrid-columnHeaders": {
-                        background: `linear-gradient(90deg, ${alpha(
-                            colors.blueAccent[700],
-                            0.9
-                        )}, ${alpha(theme.palette.primary.main, 0.4)})`,
+                        background: `linear-gradient(90deg, ${alpha(colors.blueAccent[700], 0.9)}, ${alpha(theme.palette.primary.main, 0.4)})`,
                         borderBottom: "none",
                     },
                     "& .MuiDataGrid-virtualScroller": { backgroundColor: colors.primary[400] },
@@ -338,9 +332,7 @@ function FilesTab({ colors }) {
                     getRowId={(r) => r.id}
                     disableRowSelectionOnClick
                     slots={{ toolbar: GridToolbar }}
-                    slotProps={{
-                        toolbar: { showQuickFilter: true, quickFilterProps: { debounceMs: 300 } },
-                    }}
+                    slotProps={{ toolbar: { showQuickFilter: true, quickFilterProps: { debounceMs: 300 } } }}
                     initialState={{ pagination: { paginationModel: { pageSize: 25 } } }}
                 />
             </Box>
@@ -391,11 +383,9 @@ function EditReservationModal({ isOpen, onClose, reservation, onEdited }) {
 
         setSaving(true);
         try {
-            const { data } = await axios.patch(
-                `${BASE_URL}/reservations/${reservation._id}`,
-                patch,
-                { withCredentials: true }
-            );
+            const { data } = await axios.patch(`${BASE_URL}/reservations/${reservation._id}`, patch, {
+                withCredentials: true,
+            });
             onEdited?.(data);
             onClose();
         } catch (e) {
@@ -428,13 +418,7 @@ function EditReservationModal({ isOpen, onClose, reservation, onEdited }) {
                         InputLabelProps={{ shrink: true }}
                         size="small"
                     />
-                    <TextField
-                        select
-                        label="Estado"
-                        value={status}
-                        onChange={(e) => setStatus(e.target.value)}
-                        size="small"
-                    >
+                    <TextField select label="Estado" value={status} onChange={(e) => setStatus(e.target.value)} size="small">
                         {["reserved", "checked_in", "checked_out", "cancelled"].map((s) => (
                             <MenuItem key={s} value={s}>
                                 {s}
@@ -446,12 +430,7 @@ function EditReservationModal({ isOpen, onClose, reservation, onEdited }) {
                         <Button onClick={onClose} disabled={saving}>
                             Cancelar
                         </Button>
-                        <Button
-                            variant="contained"
-                            onClick={handleSave}
-                            disabled={saving}
-                            sx={[btn.base, btn.solid(theme, "success")]}
-                        >
+                        <Button variant="contained" onClick={handleSave} disabled={saving} sx={[btn.base, btn.solid(theme, "success")]}>
                             {saving ? "Guardando..." : "Guardar cambios"}
                         </Button>
                     </Stack>
@@ -462,7 +441,7 @@ function EditReservationModal({ isOpen, onClose, reservation, onEdited }) {
 }
 
 // ————————————————————————————————————————————————
-// Acciones por fila (CTA + menú Más) — SIN check-in/out manuales
+// Acciones por fila (CTA + menú Más)
 // ————————————————————————————————————————————————
 function RowActions({ row, onView, onExtend, onEdit, onDelete, onPdf }) {
     const theme = useTheme();
@@ -476,12 +455,7 @@ function RowActions({ row, onView, onExtend, onEdit, onDelete, onPdf }) {
         <Stack direction="row" spacing={1} alignItems="center">
             <Tooltip title="Ver detalle">
                 <span>
-                    <Button
-                        size="small"
-                        startIcon={<Visibility />}
-                        sx={[btn.base, btn.soft(theme, "info")]}
-                        onClick={onView}
-                    >
+                    <Button size="small" startIcon={<Visibility />} sx={[btn.base, btn.soft(theme, "info")]} onClick={onView}>
                         Detalle
                     </Button>
                 </span>
@@ -583,10 +557,7 @@ function ReservationsTab({ colors }) {
     const [deleteOpen, setDeleteOpen] = useState(false);
 
     const uniqueStatuses = useMemo(
-        () =>
-            Array.from(new Set(rows.map((r) => String(r.status || "").trim()))).filter(
-                Boolean
-            ),
+        () => Array.from(new Set(rows.map((r) => String(r.status || "").trim()))).filter(Boolean),
         [rows]
     );
 
@@ -595,28 +566,32 @@ function ReservationsTab({ colors }) {
         return s ? rows.filter((r) => String(r.status || "").toLowerCase().includes(s)) : rows;
     }, [rows, statusFilter]);
 
-    const handleEdit = (row) => {
+    const handleEdit = useCallback((row) => {
         setSelectedReservation(row.raw);
         setEditOpen(true);
-    };
-    const handleDelete = (row) => {
+    }, []);
+    const handleDelete = useCallback((row) => {
         setSelectedReservation(row.raw);
         setDeleteOpen(true);
-    };
-    const doDelete = async () => {
-        if (!selectedReservation?._id) return;
-        try {
-            await axios.delete(`${BASE_URL}/reservations/${selectedReservation._id}`, {
-                withCredentials: true,
-            });
-            setDeleteOpen(false);
-            setSelectedReservation(null);
-            refetch();
-        } catch (e) {
-            console.error("Error al eliminar:", e);
-            alert(e?.response?.data?.error || e?.message || "No se pudo eliminar la reserva.");
-        }
-    };
+    }, []);
+
+    const downloadRowPDF = useCallback((row) => {
+        const doc = new jsPDF();
+        doc.setFontSize(14);
+        doc.text(`Reserva: ${row.id}`, 14, 18);
+        doc.setFontSize(11);
+        doc.text(`Habitación: ${row.roomNumber} (${row.roomType})`, 14, 28);
+        doc.text(`Huésped/Empresa: ${row.guests}`, 14, 36);
+        doc.text(`Doc(s): ${row.docs}`, 14, 44);
+        doc.text(`Nacionalidad: ${row.nationality || "-"}`, 14, 52);
+        doc.text(`Check-In: ${dfmt(row.checkInDate)}`, 14, 60);
+        doc.text(`Check-Out: ${dfmt(row.checkOutDate)}`, 14, 68);
+        doc.text(`Noches: ${row.nights}`, 14, 76);
+        doc.text(`Tarifa: ${money(row.price)}`, 14, 84);
+        doc.text(`Total: ${money(row.total)}`, 14, 92);
+        doc.text(`Estado: ${row.status}`, 14, 100);
+        doc.save(`reserva_${row.roomNumber}_${row.id}.pdf`);
+    }, []);
 
     const columns = useMemo(
         () => [
@@ -670,45 +645,14 @@ function ReservationsTab({ colors }) {
                 ),
             },
         ],
-        [theme]
+        [handleEdit, handleDelete, downloadRowPDF]
     );
 
-    const downloadRowPDF = (row) => {
-        const doc = new jsPDF();
-        doc.setFontSize(14);
-        doc.text(`Reserva: ${row.id}`, 14, 18);
-        doc.setFontSize(11);
-        doc.text(`Habitación: ${row.roomNumber} (${row.roomType})`, 14, 28);
-        doc.text(`Huésped/Empresa: ${row.guests}`, 14, 36);
-        doc.text(`Doc(s): ${row.docs}`, 14, 44);
-        doc.text(`Nacionalidad: ${row.nationality || "-"}`, 14, 52);
-        doc.text(`Check-In: ${dfmt(row.checkInDate)}`, 14, 60);
-        doc.text(`Check-Out: ${dfmt(row.checkOutDate)}`, 14, 68);
-        doc.text(`Noches: ${row.nights}`, 14, 76);
-        doc.text(`Tarifa: ${money(row.price)}`, 14, 84);
-        doc.text(`Total: ${money(row.total)}`, 14, 92);
-        doc.text(`Estado: ${row.status}`, 14, 100);
-        doc.save(`reserva_${row.roomNumber}_${row.id}.pdf`);
-    };
-
-    const exportSelectedToPDF = () => {
+    const exportSelectedToPDF = useCallback(() => {
         const doc = new jsPDF({ orientation: "landscape" });
-        const base = selection.length
-            ? rowsView.filter((r) => selection.includes(r.id))
-            : rowsView;
+        const base = selection.length ? rowsView.filter((r) => selection.includes(r.id)) : rowsView;
         const head = [
-            [
-                "Hab.",
-                "Tipo",
-                "Huésped/Empresa",
-                "Doc(s)",
-                "Check-In",
-                "Check-Out",
-                "Noches",
-                "Tarifa",
-                "Total",
-                "Estado",
-            ],
+            ["Hab.", "Tipo", "Huésped/Empresa", "Doc(s)", "Check-In", "Check-Out", "Noches", "Tarifa", "Total", "Estado"],
         ];
         const body = base.map((r) => [
             r.roomNumber,
@@ -726,7 +670,7 @@ function ReservationsTab({ colors }) {
         doc.text(`Reservas (${base.length})`, 14, 14);
         doc.autoTable({ head, body, startY: 20, styles: { fontSize: 8 } });
         doc.save(`reservas_${from || "all"}_${to || ""}.pdf`);
-    };
+    }, [rowsView, selection, from, to]);
 
     // KPIs
     const kpis = useMemo(() => {
@@ -748,19 +692,12 @@ function ReservationsTab({ colors }) {
                     position: "sticky",
                     top: 8,
                     zIndex: 5,
-                    background: `linear-gradient(90deg, ${alpha(
-                        colors.primary[400],
-                        0.9
-                    )}, ${alpha(useTheme().palette.primary.dark, 0.4)})`,
+                    background: `linear-gradient(90deg, ${alpha(colors.primary[400], 0.9)}, ${alpha(theme.palette.primary.dark, 0.4)})`,
                     border: `1px solid ${colors.blueAccent[700]}`,
                     borderRadius: 1.5,
                 }}
             >
-                <Stack
-                    direction={{ xs: "column", sm: "row" }}
-                    spacing={1.5}
-                    alignItems={{ xs: "stretch", sm: "center" }}
-                >
+                <Stack direction={{ xs: "column", sm: "row" }} spacing={1.5} alignItems={{ xs: "stretch", sm: "center" }}>
                     <TextField
                         type="date"
                         label="Desde"
@@ -778,16 +715,12 @@ function ReservationsTab({ colors }) {
                         size="small"
                     />
                     <Stack direction="row" spacing={1}>
-                        <Button
-                            startIcon={<FilterAlt />}
-                            sx={[btn.base, btn.solid(useTheme(), "primary")]}
-                            onClick={refetch}
-                        >
+                        <Button startIcon={<FilterAlt />} sx={[btn.base, btn.solid(theme, "primary")]} onClick={refetch}>
                             Filtrar
                         </Button>
                         <Button
                             startIcon={<CleaningServices />}
-                            sx={[btn.base, btn.soft(useTheme(), "warning")]}
+                            sx={[btn.base, btn.soft(theme, "warning")]}
                             onClick={() => {
                                 setFrom("");
                                 setTo("");
@@ -799,16 +732,10 @@ function ReservationsTab({ colors }) {
                         </Button>
                     </Stack>
                     {/* Filtro por estado dinámico */}
-                    <Stack
-                        direction="row"
-                        spacing={1}
-                        sx={{ ml: { xs: 0, sm: "auto" }, flexWrap: "wrap" }}
-                    >
+                    <Stack direction="row" spacing={1} sx={{ ml: { xs: 0, sm: "auto" }, flexWrap: "wrap" }}>
                         {uniqueStatuses.map((s) => {
-                            const selected =
-                                statusFilter.toLowerCase() === String(s).toLowerCase();
-                            // eslint-disable-next-line react-hooks/rules-of-hooks
-                            const base = alpha(useTheme().palette[statusColorKey(s)].main, 1);
+                            const selected = statusFilter.toLowerCase() === String(s).toLowerCase();
+                            const base = theme.palette[statusColorKey(s)].main;
                             return (
                                 <Chip
                                     key={s || "-"}
@@ -860,10 +787,7 @@ function ReservationsTab({ colors }) {
                     "& .MuiDataGrid-root": { border: "none" },
                     "& .MuiDataGrid-cell": { borderBottom: "none" },
                     "& .MuiDataGrid-columnHeaders": {
-                        background: `linear-gradient(90deg, ${alpha(
-                            colors.blueAccent[700],
-                            0.9
-                        )}, ${alpha(useTheme().palette.primary.main, 0.4)})`,
+                        background: `linear-gradient(90deg, ${alpha(colors.blueAccent[700], 0.9)}, ${alpha(theme.palette.primary.main, 0.4)})`,
                         borderBottom: "none",
                     },
                     "& .MuiDataGrid-virtualScroller": { backgroundColor: colors.primary[400] },
@@ -884,10 +808,7 @@ function ReservationsTab({ colors }) {
                     onRowSelectionModelChange={(m) => setSelection(m)}
                     rowSelectionModel={selection}
                     getRowClassName={(p) =>
-                        `row-st-${String(p.row.status || "")
-                            .trim()
-                            .toLowerCase()
-                            .replace(/\s+/g, "-")}`
+                        `row-st-${String(p.row.status || "").trim().toLowerCase().replace(/\s+/g, "-")}`
                     }
                     initialState={{
                         pagination: { paginationModel: { pageSize: 25 } },
@@ -896,9 +817,7 @@ function ReservationsTab({ colors }) {
                     }}
                     pageSizeOptions={[10, 25, 50]}
                     slots={{ toolbar: GridToolbar }}
-                    slotProps={{
-                        toolbar: { showQuickFilter: true, quickFilterProps: { debounceMs: 300 } },
-                    }}
+                    slotProps={{ toolbar: { showQuickFilter: true, quickFilterProps: { debounceMs: 300 } } }}
                 />
             </Box>
 
@@ -918,7 +837,7 @@ function ReservationsTab({ colors }) {
                     <span>
                         <Button
                             startIcon={<PictureAsPdf />}
-                            sx={[btn.base, btn.outline(useTheme(), "secondary")]}
+                            sx={[btn.base, btn.outline(theme, "secondary")]}
                             onClick={exportSelectedToPDF}
                             disabled={!rowsView.length}
                         >
@@ -929,18 +848,13 @@ function ReservationsTab({ colors }) {
             </Stack>
 
             {/* MODAL DETALLE */}
-            <CustomModal
-                isOpen={detailOpen}
-                toggle={() => setDetailOpen(false)}
-                title="Detalle de reservación"
-            >
+            <CustomModal isOpen={detailOpen} toggle={() => setDetailOpen(false)} title="Detalle de reservación">
                 {!selectedReservation ? (
                     <Typography>Cargando…</Typography>
                 ) : (
                     <Box>
                         <Typography>
-                            <b>Habitación:</b> {selectedReservation.room?.number} (
-                            {selectedReservation.room?.type})
+                            <b>Habitación:</b> {selectedReservation.room?.number} ({selectedReservation.room?.type})
                         </Typography>
                         <Typography>
                             <b>Check-In:</b> {dfmt(selectedReservation.checkInDate)}
@@ -959,15 +873,12 @@ function ReservationsTab({ colors }) {
                                 <li key={i}>
                                     {u.razonSocial ? (
                                         <span>
-                                            <b>{u.razonSocial}</b> • RUC {u.docNumber} •{" "}
-                                            {u.direccion || "—"}
+                                            <b>{u.razonSocial}</b> • RUC {u.docNumber} • {u.direccion || "—"}
                                         </span>
                                     ) : (
                                         <span>
-                                            {[u.nombres, u.apellidoPaterno, u.apellidoMaterno]
-                                                .filter(Boolean)
-                                                .join(" ")}{" "}
-                                            • {u.docType} {u.docNumber}
+                                            {[u.nombres, u.apellidoPaterno, u.apellidoMaterno].filter(Boolean).join(" ")} • {u.docType}{" "}
+                                            {u.docNumber}
                                         </span>
                                     )}
                                     {u.nationality ? ` • ${u.nationality}` : null}
@@ -983,15 +894,11 @@ function ReservationsTab({ colors }) {
                 isOpen={extendOpen}
                 toggle={() => setExtendOpen(false)}
                 reservation={
-                    selectedReservation
-                        ? { _id: selectedReservation._id, checkOutDate: selectedReservation.checkOutDate }
-                        : null
+                    selectedReservation ? { _id: selectedReservation._id, checkOutDate: selectedReservation.checkOutDate } : null
                 }
                 onExtended={() => {
-                    // El back auto-recalcula; sólo refrescamos
-                    // para ver nuevos totales/fechas
-                    // (sincroniza con cron cada 5 min también)
-                    window.setTimeout(() => { /* noop */ }, 0);
+                    setExtendOpen(false);
+                    refetch();
                 }}
             />
 
@@ -1000,35 +907,38 @@ function ReservationsTab({ colors }) {
                 isOpen={editOpen}
                 onClose={() => setEditOpen(false)}
                 reservation={selectedReservation}
-                onEdited={() => { /* refetch afuera si quieres */ }}
+                onEdited={() => {
+                    setEditOpen(false);
+                    refetch();
+                }}
             />
 
             {/* MODAL CONFIRMAR ELIMINACIÓN */}
-            <CustomModal
-                isOpen={deleteOpen}
-                toggle={() => setDeleteOpen(false)}
-                title="Eliminar reservación"
-            >
+            <CustomModal isOpen={deleteOpen} toggle={() => setDeleteOpen(false)} title="Eliminar reservación">
                 {!selectedReservation ? (
                     <Typography>Cargando…</Typography>
                 ) : (
                     <Box>
                         <Typography sx={{ mb: 1.5 }}>
-                            ¿Seguro que deseas <b>eliminar</b> la reserva de la habitación{" "}
-                            <b>{selectedReservation.room?.number}</b>?
+                            ¿Seguro que deseas <b>eliminar</b> la reserva de la habitación <b>{selectedReservation.room?.number}</b>?
                         </Typography>
                         <Stack direction="row" spacing={1} justifyContent="flex-end">
                             <Button onClick={() => setDeleteOpen(false)}>Cancelar</Button>
-                            <Button color="error" variant="contained" onClick={async () => {
-                                try {
-                                    await axios.delete(`${BASE_URL}/reservations/${selectedReservation._id}`, { withCredentials: true });
-                                    setDeleteOpen(false);
-                                    setSelectedReservation(null);
-                                } catch (e) {
-                                    console.error("Error al eliminar:", e);
-                                    alert(e?.response?.data?.error || e?.message || "No se pudo eliminar la reserva.");
-                                }
-                            }}>
+                            <Button
+                                color="error"
+                                variant="contained"
+                                onClick={async () => {
+                                    try {
+                                        await axios.delete(`${BASE_URL}/reservations/${selectedReservation._id}`, { withCredentials: true });
+                                        setDeleteOpen(false);
+                                        setSelectedReservation(null);
+                                        refetch();
+                                    } catch (e) {
+                                        console.error("Error al eliminar:", e);
+                                        alert(e?.response?.data?.error || e?.message || "No se pudo eliminar la reserva.");
+                                    }
+                                }}
+                            >
                                 Sí, eliminar
                             </Button>
                         </Stack>
@@ -1049,10 +959,7 @@ export default function Reports() {
 
     return (
         <Box m="20px">
-            <Header
-                title="Reports"
-                subtitle="Descarga de archivos y panel de reservas con exportaciones"
-            />
+            <Header title="Reports" subtitle="Descarga de archivos y panel de reservas con exportaciones" />
 
             <Tabs
                 value={tab}
@@ -1066,11 +973,7 @@ export default function Reports() {
                 <Tab label="Reservas" />
             </Tabs>
 
-            {tab === 0 ? (
-                <FilesTab colors={colors} />
-            ) : (
-                <ReservationsTab colors={colors} />
-            )}
+            {tab === 0 ? <FilesTab colors={colors} /> : <ReservationsTab colors={colors} />}
         </Box>
     );
 }

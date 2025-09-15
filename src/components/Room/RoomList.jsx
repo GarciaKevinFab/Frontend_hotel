@@ -1,3 +1,4 @@
+// src/components/Room/RoomList.jsx
 import React, { useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -17,7 +18,7 @@ import {
  *   rooms: Array<{ _id, number, type, status, price }>
  *   handleEdit(id)
  *   handleDelete(id)
- *   onQuickToggle(id)   // 👈 NUEVO: doble clic cleaning -> available
+ *   onQuickToggle(id)   // doble clic cuando está en cleaning -> available
  */
 
 const money = (v) =>
@@ -45,7 +46,7 @@ const BedRow = ({ n = 1 }) => (
 );
 
 export default function RoomList({ rooms = [], handleEdit, handleDelete, onQuickToggle }) {
-    // --- single-file styles injection ---
+    // single-file styles injection
     useEffect(() => {
         const css = `
       :root {
@@ -77,7 +78,7 @@ export default function RoomList({ rooms = [], handleEdit, handleDelete, onQuick
 
       .room-card { position: relative; border: 1px solid var(--line); background: linear-gradient(180deg, var(--card-2), var(--card)); color: var(--ink); border-radius: 18px; overflow: hidden; box-shadow: var(--shadow-1); display: grid; grid-template-rows: auto 1fr auto; transition: transform .15s ease, box-shadow .2s ease, border-color .2s ease; }
       .room-card:hover { transform: translateY(-2px); border-color: color-mix(in oklab, var(--brand) 40%, var(--line)); box-shadow: var(--shadow-2); }
-      .room-card.st-cleaning { cursor: pointer; }  /* 👈 se nota clickable cuando está cleaning */
+      .room-card.st-cleaning { cursor: pointer; }
 
       .room-hero { position: absolute; right: -8px; bottom: -10px; font-size: 120px; line-height: 1; color: color-mix(in oklab, var(--brand) 18%, transparent); opacity: .10; pointer-events: none; }
 
@@ -130,16 +131,16 @@ export default function RoomList({ rooms = [], handleEdit, handleDelete, onQuick
             <h2 id="rooms-title" className="room-list-title">Rooms</h2>
 
             <div className="legend" aria-hidden>
-                <span className="chip" style={{ ['--tint']: '#16a34a' }}>
+                <span className="chip" style={{ '--tint': '#16a34a' }}>
                     <FontAwesomeIcon icon={faCircleCheck} /> Disponible
                 </span>
-                <span className="chip" style={{ ['--tint']: '#ef4444' }}>
+                <span className="chip" style={{ '--tint': '#ef4444' }}>
                     <FontAwesomeIcon icon={faBedPulse} /> Ocupada
                 </span>
-                <span className="chip" style={{ ['--tint']: '#f59e0b' }}>
+                <span className="chip" style={{ '--tint': '#f59e0b' }}>
                     <FontAwesomeIcon icon={faBroom} /> Limpieza
                 </span>
-                <span className="chip" style={{ ['--tint']: '#06b6d4' }}>
+                <span className="chip" style={{ '--tint': '#06b6d4' }}>
                     <FontAwesomeIcon icon={faScrewdriverWrench} /> Mantenimiento
                 </span>
             </div>
@@ -148,7 +149,9 @@ export default function RoomList({ rooms = [], handleEdit, handleDelete, onQuick
                 <div className="empty-state" role="status" aria-live="polite">
                     <FontAwesomeIcon icon={faCircleInfo} size="2x" />
                     <div className="empty-title">No hay habitaciones para mostrar</div>
-                    <p className="empty-sub">Agrega una nueva habitación desde el panel. Aquí verás el estado, tipo, camas y la tarifa por noche.</p>
+                    <p className="empty-sub">
+                        Agrega una nueva habitación desde el panel. Aquí verás el estado, tipo, camas y la tarifa por noche.
+                    </p>
                 </div>
             ) : (
                 <div className="room-list-container">
@@ -163,11 +166,7 @@ export default function RoomList({ rooms = [], handleEdit, handleDelete, onQuick
                                 className={`room-card st-${meta.cls}`}
                                 aria-label={`Habitación ${room.number}, ${meta.label}`}
                                 onDoubleClick={() => canToggle && onQuickToggle?.(room._id)}
-                                title={
-                                    canToggle
-                                        ? "Doble clic para marcar como disponible"
-                                        : " "
-                                }
+                                title={canToggle ? "Doble clic para marcar como disponible" : " "}
                             >
                                 <div className="room-hero" aria-hidden="true">
                                     <FontAwesomeIcon icon={faBed} />
@@ -186,7 +185,10 @@ export default function RoomList({ rooms = [], handleEdit, handleDelete, onQuick
 
                                     <BedRow n={beds} />
 
-                                    <div className="chip price" aria-label={`Tarifa: ${room.price ? money(room.price) : 'Sin tarifa'}`}>
+                                    <div
+                                        className="chip price"
+                                        aria-label={`Tarifa: ${room.price ? money(room.price) : 'Sin tarifa'}`}
+                                    >
                                         <FontAwesomeIcon icon={faMoneyBillWave} />
                                         {room.price ? money(room.price) : "Sin tarifa"}
                                     </div>

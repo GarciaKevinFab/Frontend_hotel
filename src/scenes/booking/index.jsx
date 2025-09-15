@@ -1,10 +1,11 @@
-import React, { useState, useEffect, useMemo } from 'react';
-import { toast } from 'react-toastify';
-import axios from 'axios';
+// src/scenes/booking/index.jsx
+import React, { useState, useEffect, useMemo, useCallback } from "react";
+import { toast } from "react-toastify";
+import axios from "axios";
 import { Button, FormGroup, Input, Label, Form } from "reactstrap";
 import { BASE_URL } from "../../utils/config";
-import DocumentField from '../../components/ID/DocumentField';
-import PaymentFields from '../../components/Payment/PaymentFields';
+import DocumentField from "../../components/ID/DocumentField";
+import PaymentFields from "../../components/Payment/PaymentFields";
 
 const countries = [
     "Afghanistan", "Albania", "Algeria", "Andorra", "Angola", "Antigua and Barbuda", "Argentina", "Armenia", "Australia", "Austria",
@@ -29,14 +30,14 @@ const countries = [
     "Vanuatu", "Vatican City", "Venezuela", "Vietnam", "Yemen", "Zambia", "Zimbabwe"
 ];
 
-const money = (v) =>
-    new Intl.NumberFormat('es-PE', { style: 'currency', currency: 'PEN' }).format(Number(v || 0));
+const money = (v) => new Intl.NumberFormat("es-PE", { style: "currency", currency: "PEN" }).format(Number(v || 0));
 
 // helpers val cliente
-const isDNI = (v = '') => /^\d{8}$/.test(v);
-const isRUC = (v = '') => /^\d{11}$/.test(v);
-const isCEE = (v = '') => /^[A-Za-z0-9\-]{8,}$/.test(v);
-const isPeruPhone9 = (v = '') => /^9\d{8}$/.test(v);
+const isDNI = (v = "") => /^\d{8}$/.test(v);
+const isRUC = (v = "") => /^\d{11}$/.test(v);
+// ⚠️ Evita escape innecesario del guion: colócalo al inicio del char class
+const isCEE = (v = "") => /^[-A-Za-z0-9_]+$/.test(v);
+const isPeruPhone9 = (v = "") => /^9\d{8}$/.test(v);
 
 // fechas helpers
 const parseISO = (s) => (s ? new Date(`${s}T00:00:00`) : null);
@@ -52,16 +53,16 @@ export default function BookingForm() {
     const [availableRooms, setAvailableRooms] = useState([]);
     const [loadingRooms, setLoadingRooms] = useState(false);
 
-    const [nationality, setNationality] = useState('Peru');
-    const [docType, setDocType] = useState([]);     // ["DNI","CEE","RUC",...]
-    const [idValues, setIdValues] = useState([]);   // ["12345678","X1234",...]
-    const [userData, setUserData] = useState([]);   // [{nombres, apellidos, razonSocial, ...}, ...]
+    const [nationality, setNationality] = useState("Peru");
+    const [docType, setDocType] = useState([]); // ["DNI","CEE","RUC",...]
+    const [idValues, setIdValues] = useState([]); // ["12345678","X1234",...]
+    const [userData, setUserData] = useState([]); // [{nombres, apellidos, razonSocial, ...}, ...]
 
-    const [payment, setPayment] = useState({ method: 'POS', data: {} });
+    const [payment, setPayment] = useState({ method: "POS", data: {} });
 
     // ⬇️ Check-in / out AUTOMÁTICO: hoy y mañana
     const [reservationData, setReservationData] = useState({
-        room: '',
+        room: "",
         checkInDate: todayISO(),
         checkOutDate: addDaysISO(todayISO(), 1),
     });
@@ -108,8 +109,12 @@ export default function BookingForm() {
       .btn-modern:disabled{ filter:grayscale(.3) brightness(.8); cursor:not-allowed; }
       .empty{ text-align:center; border:1px dashed var(--line); border-radius:12px; padding:16px; color:var(--muted); }
     `;
-        let style = document.getElementById('bookingform-3col-styles');
-        if (!style) { style = document.createElement('style'); style.id = 'bookingform-3col-styles'; document.head.appendChild(style); }
+        let style = document.getElementById("bookingform-3col-styles");
+        if (!style) {
+            style = document.createElement("style");
+            style.id = "bookingform-3col-styles";
+            document.head.appendChild(style);
+        }
         style.textContent = css;
     }, []);
 
@@ -119,16 +124,22 @@ export default function BookingForm() {
             setLoadingRooms(true);
             const { data } = await axios.get(`${BASE_URL}/rooms`, { withCredentials: true });
             // 🔒 Normaliza _id a string para evitar comparaciones ObjectId vs string
-            const normalized = (data || []).map(r => ({ ...r, _id: String(r._id) }));
-            const available = normalized.filter((room) => room.status === 'available');
+            const normalized = (data || []).map((r) => ({ ...r, _id: String(r._id) }));
+            const available = normalized.filter((room) => room.status === "available");
             setRooms(normalized || []);
             setAvailableRooms(available);
         } catch (e) {
+            // eslint-disable-next-line no-console
             console.error(e);
-            toast.error('Error fetching rooms');
-        } finally { setLoadingRooms(false); }
+            toast.error("Error fetching rooms");
+        } finally {
+            setLoadingRooms(false);
+        }
     };
-    useEffect(() => { fetchRooms(); }, []);
+    useEffect(() => {
+        fetchRooms();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     // noches (solo display)
     const nights = useMemo(() => {
@@ -143,22 +154,27 @@ export default function BookingForm() {
         () =>
             availableRooms.find((r) => String(r._id) === String(reservationData.room)) ||
             rooms.find((r) => String(r._id) === String(reservationData.room)),
-        [availableRooms, rooms, reservationData.room]
+        [availableRooms, rooms, reservationData.room]);
+
+    const total = useMemo(
+        () => (selectedRoom?.price ? Number(selectedRoom.price) * nights : 0),
+        [selectedRoom, nights]
     );
-    const total = useMemo(() => (selectedRoom?.price ? Number(selectedRoom.price) * nights : 0), [selectedRoom, nights]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setReservationData(prev => ({ ...prev, [name]: value }));
+        setReservationData((prev) => ({ ...prev, [name]: value }));
     };
 
-    const capacityByType = (type = '') => {
+    const capacityByType = (type = "") => {
         switch (type) {
-            case 'Matrimonial':
-            case 'Doble':
-            case 'Suite': return 2;
-            case 'Simple':
-            default: return 1;
+            case "Matrimonial":
+            case "Doble":
+            case "Suite":
+                return 2;
+            case "Simple":
+            default:
+                return 1;
         }
     };
 
@@ -167,22 +183,27 @@ export default function BookingForm() {
         const selected = rooms.find((room) => String(room._id) === roomId);
         const cap = capacityByType(selected?.type);
 
-        setReservationData(prev => ({
+        setReservationData((prev) => ({
             ...prev,
-            room: selected ? String(selected._id) : '',
+            room: selected ? String(selected._id) : "",
             // Si por alguna razón las fechas vienen vacías, re-autocompleta
             checkInDate: prev.checkInDate || todayISO(),
             checkOutDate: prev.checkOutDate || addDaysISO(todayISO(), 1),
         }));
 
         // inicializa arrays por capacidad
-        setUserData(Array.from({ length: cap }, () => ({
-            nombres: '', apellidoPaterno: '', apellidoMaterno: '',
-            razonSocial: '', direccion: '',
-            nationality,
-        })));
-        setDocType(Array.from({ length: cap }, () => (nationality === 'Peru' ? 'DNI' : 'CEE')));
-        setIdValues(Array.from({ length: cap }, () => ''));
+        setUserData(
+            Array.from({ length: cap }, () => ({
+                nombres: "",
+                apellidoPaterno: "",
+                apellidoMaterno: "",
+                razonSocial: "",
+                direccion: "",
+                nationality,
+            }))
+        );
+        setDocType(Array.from({ length: cap }, () => (nationality === "Peru" ? "DNI" : "CEE")));
+        setIdValues(Array.from({ length: cap }, () => ""));
     };
 
     const handleNationalityChange = (e) => {
@@ -190,45 +211,51 @@ export default function BookingForm() {
         setNationality(value);
 
         // Ajusta docType para todos los slots (mantiene RUC si ya estaba)
-        setDocType(prev => prev.map(dt => {
-            if (dt === 'RUC') return 'RUC';
-            return value === 'Peru' ? 'DNI' : 'CEE';
-        }));
+        setDocType((prev) =>
+            prev.map((dt) => {
+                if (dt === "RUC") return "RUC";
+                return value === "Peru" ? "DNI" : "CEE";
+            })
+        );
 
-        setUserData(prev => prev.map(u => ({ ...u, nationality: value })));
+        setUserData((prev) => prev.map((u) => ({ ...u, nationality: value })));
     };
 
-    // validaciones cliente (arrays)
-    const validateGuests = () => {
-        if (!userData.length) return 'Falta al menos un huésped.';
+    // -------- Validaciones (memorizadas) --------
+    const validateGuests = useCallback(() => {
+        if (!userData.length) return "Falta al menos un huésped.";
         for (let i = 0; i < userData.length; i++) {
-            const t = (docType[i] || (nationality === 'Peru' ? 'DNI' : 'CEE'));
-            const num = (idValues[i] || '').trim();
+            const t = docType[i] || (nationality === "Peru" ? "DNI" : "CEE");
+            const num = (idValues[i] || "").trim();
             if (!t || !num) return `Huésped ${i + 1}: tipo y número de documento son obligatorios.`;
-            if (t === 'DNI' && !isDNI(num)) return `Huésped ${i + 1}: DNI inválido (8 dígitos).`;
-            if (t === 'CEE' && !isCEE(num)) return `Huésped ${i + 1}: CEE inválido.`;
-            if (t === 'RUC') {
+            if (t === "DNI" && !isDNI(num)) return `Huésped ${i + 1}: DNI inválido (8 dígitos).`;
+            if (t === "CEE" && !isCEE(num)) return `Huésped ${i + 1}: CEE inválido.`;
+            if (t === "RUC") {
                 if (!isRUC(num)) return `Huésped ${i + 1}: RUC inválido (11 dígitos).`;
-                if (!userData[i]?.razonSocial?.trim()) return `Huésped ${i + 1}: razón social obligatoria para RUC.`;
-                if (!userData[i]?.direccion?.trim()) return `Huésped ${i + 1}: dirección obligatoria para RUC.`;
+                if (!userData[i]?.razonSocial?.trim())
+                    return `Huésped ${i + 1}: razón social obligatoria para RUC.`;
+                if (!userData[i]?.direccion?.trim())
+                    return `Huésped ${i + 1}: dirección obligatoria para RUC.`;
             }
         }
         return null;
-    };
+    }, [userData, docType, nationality, idValues]);
 
-    const validatePaymentClient = () => {
+    const validatePaymentClient = useCallback(() => {
         const m = payment?.method;
-        if (!m) return 'Elige método de pago.';
+        if (!m) return "Elige método de pago.";
         const d = payment?.data || {};
-        if (m === 'POS' && !d.voucher) return 'Falta voucher POS.';
-        if (m === 'PagoEfectivo' && !d.cip) return 'Falta CIP de PagoEfectivo.';
-        if (m === 'Yape' && !d.phone) return 'Falta teléfono de Yape.';
-        if (m === 'Yape' && d.phone && !isPeruPhone9(d.phone)) return 'Teléfono Yape inválido (9 dígitos, inicia con 9).';
-        if (m === 'Credito' && !d.plazoDias) return 'Falta plazo de crédito (días).';
+        if (m === "POS" && !d.voucher) return "Falta voucher POS.";
+        if (m === "PagoEfectivo" && !d.cip) return "Falta CIP de PagoEfectivo.";
+        if (m === "Yape" && !d.phone) return "Falta teléfono de Yape.";
+        if (m === "Yape" && d.phone && !isPeruPhone9(d.phone))
+            return "Teléfono Yape inválido (9 dígitos, inicia con 9).";
+        if (m === "Credito" && !d.plazoDias) return "Falta plazo de crédito (días).";
         return null;
-    };
+    }, [payment]);
 
     const [submitting, setSubmitting] = useState(false);
+
     const isFormReady = useMemo(() => {
         if (!reservationData.room) return false;
         if (!reservationData.checkInDate || !reservationData.checkOutDate) return false; // autocompletadas
@@ -236,7 +263,14 @@ export default function BookingForm() {
         if (validateGuests()) return false;
         if (validatePaymentClient()) return false;
         return true;
-    }, [reservationData, nights, userData, docType, idValues, payment]);
+    }, [
+        reservationData.room,
+        reservationData.checkInDate,
+        reservationData.checkOutDate,
+        nights,
+        validateGuests,
+        validatePaymentClient,
+    ]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -245,15 +279,15 @@ export default function BookingForm() {
             if (gErr) return toast.error(gErr);
             const pErr = validatePaymentClient();
             if (pErr) return toast.error(pErr);
-            return toast.error('Completa los campos requeridos.');
+            return toast.error("Completa los campos requeridos.");
         }
         try {
             setSubmitting(true);
 
             const payload = {
                 room: String(reservationData.room),
-                checkInDate: reservationData.checkInDate,     // YYYY-MM-DD
-                checkOutDate: reservationData.checkOutDate,   // YYYY-MM-DD
+                checkInDate: reservationData.checkInDate, // YYYY-MM-DD
+                checkOutDate: reservationData.checkOutDate, // YYYY-MM-DD
                 userData: userData.map((g, i) => ({
                     ...g,
                     nombres: g.nombres?.trim() || undefined,
@@ -261,59 +295,84 @@ export default function BookingForm() {
                     apellidoMaterno: g.apellidoMaterno?.trim() || undefined,
                     razonSocial: g.razonSocial?.trim() || undefined,
                     direccion: g.direccion?.trim() || undefined,
-                    docType: String(docType[i] || '').toUpperCase(),
-                    docNumber: String(idValues[i] || '').trim(),
-                    nationality: g.nationality || nationality || 'Peru',
+                    docType: String(docType[i] || "").toUpperCase(),
+                    docNumber: String(idValues[i] || "").trim(),
+                    nationality: g.nationality || nationality || "Peru",
                 })),
                 nationality,
                 payment: { method: payment.method, data: payment.data },
             };
 
-            const res = await axios.post(`${BASE_URL}/reservations`, payload, { withCredentials: true });
+            const res = await axios.post(`${BASE_URL}/reservations`, payload, {
+                withCredentials: true,
+            });
             if (res.status === 201) {
-                toast.success('Reservación creada con éxito');
+                toast.success("Reservación creada con éxito");
                 fetchRooms();
                 resetForm();
             } else {
-                toast.error('Error al crear la reservación');
+                toast.error("Error al crear la reservación");
             }
         } catch (error) {
-            console.error('Error al crear la reservación:', error);
-            const msg = error?.response?.data?.message || error?.response?.data?.error || 'Error al crear la reservación';
+            // eslint-disable-next-line no-console
+            console.error("Error al crear la reservación:", error);
+            const msg =
+                error?.response?.data?.message ||
+                error?.response?.data?.error ||
+                "Error al crear la reservación";
             toast.error(msg);
-        } finally { setSubmitting(false); }
+        } finally {
+            setSubmitting(false);
+        }
     };
 
     const resetForm = () => {
         setReservationData({
-            room: '',
+            room: "",
             checkInDate: todayISO(),
             checkOutDate: addDaysISO(todayISO(), 1),
         });
-        setNationality('Peru');
+        setNationality("Peru");
         setUserData([]);
         setDocType([]);
         setIdValues([]);
-        setPayment({ method: 'POS', data: {} });
+        setPayment({ method: "POS", data: {} });
     };
 
     const minCheckIn = todayISO();
-    const minCheckOut = reservationData.checkInDate ? addDaysISO(reservationData.checkInDate, 1) : addDaysISO(minCheckIn, 1);
+    const minCheckOut = reservationData.checkInDate
+        ? addDaysISO(reservationData.checkInDate, 1)
+        : addDaysISO(minCheckIn, 1);
 
     return (
-        <Form onSubmit={handleSubmit} className="booking-shell booking-card" role="form" aria-describedby="booking-desc">
+        <Form
+            onSubmit={handleSubmit}
+            className="booking-shell booking-card"
+            role="form"
+            aria-describedby="booking-desc"
+        >
             <div className="booking-header">
                 <div>
                     <div className="booking-title">Nueva Reservación</div>
-                    <div id="booking-desc" className="hint">Elige habitación y fechas, registra huéspedes y procesa el pago.</div>
+                    <div id="booking-desc" className="hint">
+                        Elige habitación y fechas, registra huéspedes y procesa el pago.
+                    </div>
                 </div>
-                <span className="badge-soft">{loadingRooms ? 'Cargando habitaciones…' : `${availableRooms.length} disponibles`}</span>
+                <span className="badge-soft">
+                    {loadingRooms ? "Cargando habitaciones…" : `${availableRooms.length} disponibles`}
+                </span>
             </div>
 
             <nav className="quick-nav" aria-label="Secciones">
-                <a href="#sec-room" className="qchip">Habitación y fechas</a>
-                <a href="#sec-guests" className="qchip">Huéspedes</a>
-                <a href="#sec-payment" className="qchip">Pago y resumen</a>
+                <a href="#sec-room" className="qchip">
+                    Habitación y fechas
+                </a>
+                <a href="#sec-guests" className="qchip">
+                    Huéspedes
+                </a>
+                <a href="#sec-payment" className="qchip">
+                    Pago y resumen
+                </a>
             </nav>
 
             <div className="grid">
@@ -342,7 +401,7 @@ export default function BookingForm() {
                             <div className="hint">Solo se listan habitaciones disponibles.</div>
                         </FormGroup>
 
-                        {/* Fechas AUTOCOMPLETADAS (las mostramos por transparencia, pero ya vienen puestas) */}
+                        {/* Fechas AUTOCOMPLETADAS */}
                         <div className="row-2">
                             <FormGroup>
                                 <Label htmlFor="checkInDate">Check-In</Label>
@@ -384,7 +443,11 @@ export default function BookingForm() {
                                 className="form-input"
                                 value={nationality}
                             >
-                                {countries.map((c) => (<option key={c} value={c}>{c}</option>))}
+                                {countries.map((c) => (
+                                    <option key={c} value={c}>
+                                        {c}
+                                    </option>
+                                ))}
                             </Input>
                         </FormGroup>
                     </div>
@@ -394,17 +457,27 @@ export default function BookingForm() {
                 <div className="center">
                     <div id="sec-guests" className="section">
                         <h5>Huéspedes</h5>
-                        {!userData.length && <div className="hint">Selecciona una habitación para generar los campos de huéspedes.</div>}
+                        {!userData.length && (
+                            <div className="hint">
+                                Selecciona una habitación para generar los campos de huéspedes.
+                            </div>
+                        )}
                         {userData.map((guest, index) => (
                             <div key={index} className="guest-card">
                                 <h6 style={{ margin: 0, fontWeight: 800 }}>
-                                    {(docType[index] || (nationality === 'Peru' ? 'DNI' : 'CEE')) === 'RUC' ? 'Empresa' : 'Huésped'} {index + 1}
+                                    {(docType[index] || (nationality === "Peru" ? "DNI" : "CEE")) === "RUC"
+                                        ? "Empresa"
+                                        : "Huésped"}{" "}
+                                    {index + 1}
                                 </h6>
                                 <DocumentField
                                     index={index}
-                                    docType={docType} setDocType={setDocType}
-                                    idValues={idValues} setIdValues={setIdValues}
-                                    userData={userData} setUserData={setUserData}
+                                    docType={docType}
+                                    setDocType={setDocType}
+                                    idValues={idValues}
+                                    setIdValues={setIdValues}
+                                    userData={userData}
+                                    setUserData={setUserData}
                                     nationality={nationality}
                                 />
                             </div>
@@ -418,10 +491,24 @@ export default function BookingForm() {
                         <div className="section">
                             <h5>Resumen</h5>
                             <div className="summary" aria-live="polite">
-                                <div className="chip"><span>Habitación</span><strong>{selectedRoom ? `#${selectedRoom.number} — ${selectedRoom.type}` : '—'}</strong></div>
-                                <div className="chip"><span>Noches</span><strong>{nights}</strong></div>
-                                <div className="chip"><span>Tarifa</span><strong>{selectedRoom?.price ? money(selectedRoom.price) : '—'}</strong></div>
-                                <div className="chip total"><span>Total</span><strong>{money(total)}</strong></div>
+                                <div className="chip">
+                                    <span>Habitación</span>
+                                    <strong>
+                                        {selectedRoom ? `#${selectedRoom.number} — ${selectedRoom.type}` : "—"}
+                                    </strong>
+                                </div>
+                                <div className="chip">
+                                    <span>Noches</span>
+                                    <strong>{nights}</strong>
+                                </div>
+                                <div className="chip">
+                                    <span>Tarifa</span>
+                                    <strong>{selectedRoom?.price ? money(selectedRoom.price) : "—"}</strong>
+                                </div>
+                                <div className="chip total">
+                                    <span>Total</span>
+                                    <strong>{money(total)}</strong>
+                                </div>
                                 <div className="hint">El total varía según noches y tarifa actual.</div>
                             </div>
                         </div>
@@ -445,18 +532,24 @@ export default function BookingForm() {
                             </FormGroup>
                             <PaymentFields payment={payment} setPayment={setPayment} />
                             <div className="actions" style={{ marginTop: 12 }}>
-                                <Button type="submit" className="btn-modern" disabled={submitting || !isFormReady} aria-busy={submitting}>
-                                    {submitting ? 'Reservando…' : 'Reservar'}
+                                <Button
+                                    type="submit"
+                                    className="btn-modern"
+                                    disabled={submitting || !isFormReady}
+                                    aria-busy={submitting}
+                                >
+                                    {submitting ? "Reservando…" : "Reservar"}
                                 </Button>
                             </div>
                         </div>
                     </div>
                 </div>
-
             </div>
 
-            {(!loadingRooms && availableRooms.length === 0) && (
-                <div className="empty" role="status" style={{ marginTop: 14 }}>No hay habitaciones disponibles por ahora.</div>
+            {!loadingRooms && availableRooms.length === 0 && (
+                <div className="empty" role="status" style={{ marginTop: 14 }}>
+                    No hay habitaciones disponibles por ahora.
+                </div>
             )}
         </Form>
     );
