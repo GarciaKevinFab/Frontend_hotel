@@ -1,0 +1,23 @@
+.payment-section {
+    position: relative;
+    z-index: 10000;
+    /* por si algo se superpone */
+}
+
+.payment-section input,
+.payment-section select {
+    pointer-events: auto !important;
+}
+
+/* Por si algún estilo global pone disabled via CSS */
+.payment-section input[disabled],
+.payment-section select[disabled] {
+    opacity: 1 !important;
+}
+
+/* Asegura contraste en tu tema oscuro */
+.payment-section .form-control.form-input {
+    background-color: #444 !important;
+    color: #fff !important;
+    border: 1px solid #555 !important;
+}

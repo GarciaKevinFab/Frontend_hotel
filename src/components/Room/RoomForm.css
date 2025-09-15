@@ -1,0 +1,38 @@
+/* RoomForm.css */
+.room-form {
+    background-color: #000000;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    max-width: 400px;
+    margin: auto;
+}
+
+.form-input {
+    margin-bottom: 15px;
+    border-radius: 5px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.form-input:focus {
+    border-color: #61dafb;
+    box-shadow: 0 0 10px rgba(97, 218, 251, 0.5);
+    outline: none;
+}
+
+.form-submit-btn {
+    background-color: #61dafb;
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.3s;
+}
+
+.form-submit-btn:hover {
+    background-color: #21a1f1;
+    transform: scale(1.05);
+}

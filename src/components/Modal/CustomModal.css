@@ -1,0 +1,316 @@
+/* ================================
+   Variables de color (tema oscuro)
+   ================================ */
+.custom-modal {
+    --cm-ink: #e5e7eb;
+    --cm-muted: #94a3b8;
+    --cm-line: #243047;
+    --cm-card: #0f172a;
+    --cm-card-2: #111827;
+    --cm-brand: #6366f1;
+    --cm-soft: rgba(255, 255, 255, 0.06);
+}
+
+/* Backdrop con blur */
+.modal-backdrop.show {
+    background-color: rgba(3, 7, 18, 0.6);
+    backdrop-filter: blur(2px);
+}
+
+/* Animación suave */
+.custom-modal .modal-dialog {
+    filter: drop-shadow(0 12px 48px rgba(0, 0, 0, 0.55));
+    transition: transform 180ms ease, opacity 180ms ease;
+}
+
+.modal.fade .modal-dialog {
+    transform: translateY(10px) scale(0.985);
+    opacity: .9;
+}
+
+.modal.show .modal-dialog {
+    transform: none;
+    opacity: 1;
+}
+
+/* Contenedor */
+.custom-modal-content {
+    background: linear-gradient(180deg, var(--cm-card) 0%, var(--cm-card-2) 100%);
+    color: var(--cm-ink);
+    border: 1px solid var(--cm-line);
+    border-radius: 16px;
+    overflow: hidden;
+}
+
+/* HEADER (pegajoso) */
+.cm-header {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    background:
+        linear-gradient(120deg, rgba(99, 102, 241, 0.18), transparent 70%),
+        linear-gradient(180deg, rgba(17, 24, 39, 0.75), rgba(17, 24, 39, 0.75));
+    border-bottom: 1px solid var(--cm-line);
+    padding: 18px 24px 14px;
+    backdrop-filter: saturate(110%) blur(6px);
+}
+
+.cm-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.cm-icon {
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    background: rgba(99, 102, 241, .18);
+    color: #c7d2fe;
+    border: 1px solid rgba(99, 102, 241, .28);
+}
+
+.cm-title-text {
+    margin: 0;
+    font-weight: 800;
+    font-size: clamp(18px, 1.6vw, 22px);
+    letter-spacing: -0.01em;
+}
+
+.cm-subtitle {
+    margin: 2px 0 0;
+    color: var(--cm-muted);
+    font-size: .9rem;
+}
+
+.custom-modal .btn-close {
+    filter: invert(1) opacity(.9);
+}
+
+.custom-modal .btn-close:hover {
+    opacity: 1;
+}
+
+/* BODY */
+.cm-body {
+    padding: 18px 20px;
+}
+
+.cm-body::-webkit-scrollbar {
+    width: 8px;
+}
+
+.cm-body::-webkit-scrollbar-thumb {
+    background: rgba(148, 163, 184, .25);
+    border-radius: 999px;
+}
+
+/* FOOTER (pegajoso) */
+.cm-footer {
+    position: sticky;
+    bottom: 0;
+    z-index: 2;
+    gap: 10px;
+    background: linear-gradient(0deg, rgba(17, 24, 39, .9), rgba(17, 24, 39, .9));
+    border-top: 1px solid var(--cm-line);
+    backdrop-filter: saturate(110%) blur(4px);
+    padding: 12px 16px;
+}
+
+/* ================================
+   Reactstrap (form-control)
+   ================================ */
+.custom-modal .form-label {
+    color: #cbd5e1;
+    font-weight: 700;
+}
+
+.custom-modal .form-control,
+.custom-modal .form-select,
+.custom-modal .form-input {
+    background: var(--cm-soft);
+    border: 1px solid var(--cm-line);
+    color: #e5e7eb;
+    border-radius: 12px;
+    padding: 12px 14px;
+    transition: border-color .2s, box-shadow .2s, background .2s;
+}
+
+.custom-modal .form-control::placeholder {
+    color: #94a3b8cc;
+}
+
+.custom-modal .form-control:focus,
+.custom-modal .form-select:focus,
+.custom-modal .form-input:focus {
+    background: rgba(255, 255, 255, .09);
+    border-color: var(--cm-brand);
+    box-shadow: 0 0 0 4px rgba(99, 102, 241, .35);
+    outline: 0;
+}
+
+/* Date pickers (webkit) */
+.custom-modal input[type="date"] {
+    color-scheme: dark;
+    background-color: var(--cm-soft);
+}
+
+.custom-modal input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(1) opacity(.75);
+}
+
+/* Disabled / readOnly */
+.custom-modal .form-control:disabled,
+.custom-modal .form-control[readonly] {
+    opacity: .9;
+    color: #cbd5e1;
+    background-color: rgba(255, 255, 255, .06);
+}
+
+/* ================================
+   MUI OVERRIDES (clave)
+   ================================ */
+
+/* Label */
+.custom-modal .MuiFormLabel-root,
+.custom-modal .MuiInputLabel-root {
+    color: #cbd5e1;
+}
+
+.custom-modal .MuiFormLabel-root.Mui-focused,
+.custom-modal .MuiInputLabel-root.Mui-focused {
+    color: var(--cm-brand);
+}
+
+/* Texto */
+.custom-modal .MuiInputBase-input,
+.custom-modal .MuiSelect-select {
+    color: var(--cm-ink) !important;
+}
+
+.custom-modal .MuiInputBase-input::placeholder {
+    color: #94a3b8cc;
+}
+
+/* FILLED: fondo oscuro + borde + sin subrayado */
+.custom-modal .MuiFilledInput-root {
+    background: var(--cm-soft) !important;
+    border: 1px solid var(--cm-line) !important;
+    border-radius: 12px !important;
+    overflow: hidden;
+}
+
+.custom-modal .MuiFilledInput-root:hover {
+    background: rgba(255, 255, 255, .085) !important;
+}
+
+.custom-modal .MuiFilledInput-root.Mui-focused {
+    background: rgba(255, 255, 255, .09) !important;
+    border-color: var(--cm-brand) !important;
+    box-shadow: 0 0 0 4px rgba(99, 102, 241, .35) !important;
+}
+
+.custom-modal .MuiFilledInput-root:before,
+.custom-modal .MuiFilledInput-root:after {
+    display: none !important;
+}
+
+/* OUTLINED */
+.custom-modal .MuiOutlinedInput-root {
+    background: var(--cm-soft);
+    border-radius: 12px;
+}
+
+.custom-modal .MuiOutlinedInput-notchedOutline {
+    border-color: var(--cm-line);
+}
+
+.custom-modal .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline {
+    border-color: #2e3a55;
+}
+
+.custom-modal .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline {
+    border-color: var(--cm-brand);
+    box-shadow: 0 0 0 4px rgba(99, 102, 241, .35);
+}
+
+/* Icono del select + disabled */
+.custom-modal .MuiSelect-icon {
+    color: #cbd5e1 !important;
+}
+
+.custom-modal .MuiInputBase-root.Mui-disabled {
+    -webkit-text-fill-color: #cbd5e1;
+    color: #cbd5e1;
+    background: rgba(255, 255, 255, .06);
+}
+
+/* ===== MUI Select POPUP en portal (usar className="cm-menu") ===== */
+.cm-menu {
+    background: #0b1120 !important;
+    color: var(--cm-ink) !important;
+    border: 1px solid var(--cm-line) !important;
+    border-radius: 12px !important;
+    box-shadow: 0 16px 30px rgba(0, 0, 0, .45) !important;
+}
+
+.cm-menu .MuiList-root {
+    padding: 6px 0;
+}
+
+.cm-menu .MuiMenuItem-root {
+    color: var(--cm-ink) !important;
+}
+
+.cm-menu .MuiMenuItem-root.Mui-selected,
+.cm-menu .MuiMenuItem-root:hover {
+    background: rgba(99, 102, 241, .22) !important;
+}
+
+/* ================================
+   Botones Bootstrap (reactstrap)
+   ================================ */
+.custom-modal .btn {
+    border-radius: 12px;
+    font-weight: 800;
+    padding: 12px 16px;
+    transition: transform .08s, box-shadow .2s, background .2s;
+}
+
+.custom-modal .btn:active {
+    transform: translateY(1px);
+}
+
+.custom-modal .btn-primary {
+    background: linear-gradient(90deg, #6366f1 0%, #4f46e5 100%);
+    color: #fff;
+    border: 0;
+    box-shadow: 0 6px 18px rgba(99, 102, 241, .35);
+}
+
+.custom-modal .btn-primary:hover {
+    background: linear-gradient(90deg, #5458ef, #4b52e9);
+}
+
+.custom-modal .btn-light {
+    background: linear-gradient(180deg, #e5e7eb, #cbd5e1);
+    color: #0f172a;
+    border: 0;
+}
+
+.custom-modal .btn-light:hover {
+    background: linear-gradient(180deg, #dce1e8, #c2cbd8);
+}
+
+.custom-modal .btn-danger {
+    background: linear-gradient(90deg, #ef4444, #dc2626);
+    border: 0;
+    color: #fff;
+    box-shadow: 0 6px 18px rgba(239, 68, 68, .35);
+}
+
+.custom-modal .btn-danger:hover {
+    background: linear-gradient(90deg, #f05252, #e03131);
+}

@@ -1,0 +1,98 @@
+/* BookingForm.css */
+.booking-form {
+    background-color: #282c34;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+    animation: fadeIn 0.5s ease-in-out;
+    color: #ffffff;
+    max-width: 600px;
+    margin: auto;
+}
+
+.form-input {
+    margin-bottom: 15px;
+    border-radius: 5px;
+    padding: 10px;
+    background-color: #444;
+    border: 1px solid #555;
+    color: #fff;
+    transition: border-color 0.3s, box-shadow 0.3s;
+    width: 100%;
+}
+
+.form-input:focus {
+    border-color: #61dafb;
+    box-shadow: 0 0 10px rgba(97, 218, 251, 0.5);
+    outline: none;
+}
+
+.guest-section {
+    margin-bottom: 20px;
+    padding: 15px;
+    border: 1px solid #555;
+    border-radius: 5px;
+    background-color: #333;
+    animation: fadeInUp 0.5s ease-in-out;
+}
+
+.btn {
+    background-color: #61dafb;
+    border: none;
+    color: #282c34;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.3s;
+    width: 100%;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.btn:hover {
+    background-color: #21a1f1;
+    transform: scale(1.05);
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes fadeInUp {
+    from {
+        transform: translateY(20px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* Responsividad */
+@media (max-width: 600px) {
+    .booking-form {
+        padding: 10px;
+    }
+
+    .btn {
+        padding: 10px;
+        font-size: 14px;
+    }
+
+    .form-input {
+        padding: 8px;
+        font-size: 14px;
+    }
+
+    .guest-section {
+        padding: 10px;
+    }
+}

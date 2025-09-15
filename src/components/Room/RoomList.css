@@ -1,0 +1,232 @@
+/* ======= Paleta base (dark sólido, alto contraste) ======= */
+:root {
+    --card: #0f172a;
+    /* fondo tarjeta */
+    --card-2: #0b1324;
+    /* para gradiente */
+    --ink: #e5e7eb;
+    /* texto principal */
+    --muted: #94a3b8;
+    /* texto secundario */
+    --line: #1f2937;
+    /* bordes */
+    --brand: #6366f1;
+    /* indigo */
+    --brand-2: #4f46e5;
+    --success: #16a34a;
+    /* disponible */
+    --danger: #ef4444;
+    /* ocupada */
+    --warn: #f59e0b;
+    /* limpieza */
+    --maint: #06b6d4;
+    /* mantenimiento */
+    --soft: #111827;
+    /* chips suaves */
+    --shadow-1: 0 6px 18px rgba(2, 6, 23, .35);
+    --shadow-2: 0 10px 28px rgba(2, 6, 23, .45);
+    --fs-sm: 0.9rem;
+    --fs-xl: 1.35rem;
+    --sp-3: 16px;
+    --sp-4: 20px;
+}
+
+/* ====== Lista ====== */
+.room-list {
+    padding: var(--sp-3);
+}
+
+.room-list-title {
+    font-size: var(--fs-xl);
+    font-weight: 800;
+    text-align: center;
+    margin: 0 0 var(--sp-4) 0;
+    letter-spacing: -0.01em;
+    color: var(--ink);
+}
+
+/* Grid responsive */
+.room-list-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: var(--sp-4);
+}
+
+/* ====== Card ====== */
+.room-card {
+    position: relative;
+    border: 1px solid var(--line);
+    background: linear-gradient(180deg, var(--card-2), var(--card));
+    color: var(--ink);
+    border-radius: 18px;
+    overflow: hidden;
+    box-shadow: var(--shadow-1);
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    transition: transform .15s ease, box-shadow .2s ease, border-color .2s ease;
+}
+
+.room-card:hover {
+    transform: translateY(-2px);
+    border-color: color-mix(in oklab, var(--brand) 40%, var(--line));
+    box-shadow: var(--shadow-2);
+}
+
+/* Icono “fantasma” */
+.room-hero {
+    position: absolute;
+    right: -8px;
+    bottom: -10px;
+    font-size: 120px;
+    line-height: 1;
+    color: color-mix(in oklab, var(--brand) 18%, transparent);
+    opacity: .10;
+    pointer-events: none;
+}
+
+/* Header tintado por estado (con gradiente sutil) */
+.room-card-hdr {
+    --tint: var(--brand);
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--line);
+    background:
+        linear-gradient(120deg,
+            color-mix(in oklab, var(--tint) 28%, transparent) 0%,
+            transparent 80%);
+}
+
+/* Estados */
+.room-card.st-available .room-card-hdr {
+    --tint: var(--success);
+}
+
+.room-card.st-occupied .room-card-hdr {
+    --tint: var(--danger);
+}
+
+.room-card.st-cleaning .room-card-hdr {
+    --tint: var(--warn);
+}
+
+.room-card.st-maintenance .room-card-hdr {
+    --tint: var(--maint);
+}
+
+/* Chips */
+.chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    height: 28px;
+    padding: 0 12px;
+    border-radius: 999px;
+    font-size: var(--fs-sm);
+    font-weight: 800;
+    border: 1px solid var(--line);
+    letter-spacing: .01em;
+}
+
+.chip.status {
+    background: color-mix(in oklab, var(--tint) 16%, #0b1220);
+    color: #dbeafe;
+    border-color: color-mix(in oklab, var(--tint) 50%, var(--line));
+}
+
+.chip.price {
+    margin-top: 8px;
+    background: color-mix(in oklab, var(--brand) 10%, var(--soft));
+    color: #e2e8f0;
+    border-color: color-mix(in oklab, var(--brand) 40%, var(--line));
+}
+
+/* Body */
+.room-card-body {
+    display: grid;
+    place-items: center;
+    gap: 8px;
+    padding: 18px;
+    text-align: center;
+}
+
+.room-number {
+    font-size: clamp(20px, 2.2vw, 28px);
+    font-weight: 900;
+    letter-spacing: .02em;
+}
+
+.room-type {
+    font-size: var(--fs-sm);
+    color: var(--muted);
+}
+
+/* Camas */
+.bed-row {
+    display: inline-flex;
+    gap: 6px;
+    margin-top: 2px;
+}
+
+.bed-icon {
+    font-size: 18px;
+    color: #cbd5e1;
+    opacity: .95;
+}
+
+/* Footer / acciones */
+.room-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    padding: 12px 14px 16px;
+}
+
+/* Botones de acción con halo */
+.icon-btn {
+    border: 0;
+    border-radius: 12px;
+    padding: 10px 14px;
+    font-size: 16px;
+    cursor: pointer;
+    background: #0b1220;
+    color: #e5e7eb;
+    transition: transform .06s, box-shadow .2s, background .2s, color .2s;
+    box-shadow: 0 1px 1px rgba(2, 6, 23, .06);
+}
+
+.icon-btn:hover {
+    transform: translateY(-1px);
+}
+
+.icon-btn:active {
+    transform: translateY(0);
+}
+
+/* Edit (indigo) */
+.icon-btn.edit {
+    background: color-mix(in oklab, var(--brand) 22%, #0b1220);
+    border: 1px solid color-mix(in oklab, var(--brand) 60%, var(--line));
+}
+
+.icon-btn.edit:hover {
+    box-shadow: 0 0 0 6px color-mix(in oklab, var(--brand) 28%, transparent);
+    background: color-mix(in oklab, var(--brand) 32%, #101a33);
+}
+
+/* Danger (rojo) */
+.icon-btn.danger {
+    background: color-mix(in oklab, var(--danger) 18%, #0b1220);
+    border: 1px solid color-mix(in oklab, var(--danger) 60%, var(--line));
+    color: #fee2e2;
+}
+
+.icon-btn.danger:hover {
+    box-shadow: 0 0 0 6px color-mix(in oklab, var(--danger) 26%, transparent);
+    background: color-mix(in oklab, var(--danger) 28%, #1a0f12);
+}
+
+/* Accesibilidad al foco del teclado */
+.icon-btn:focus-visible,
+.chip:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 4px color-mix(in oklab, var(--brand) 36%, transparent);
+}

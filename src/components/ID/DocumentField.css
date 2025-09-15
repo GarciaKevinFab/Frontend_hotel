@@ -1,0 +1,23 @@
+/* DniField.css */
+.validate-btn {
+    background-color: #61dafb;
+    border: none;
+    color: #282c34;
+    padding: 10px 20px;
+    border-radius: 0 5px 5px 0;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.3s;
+}
+
+.validate-btn:hover {
+    background-color: #21a1f1;
+    transform: scale(1.05);
+}
+
+.input-group .form-control {
+    border-radius: 5px 0 0 5px;
+}
+
+.input-group {
+    margin-bottom: 15px;
+}
